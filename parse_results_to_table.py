@@ -1,7 +1,14 @@
 import os
+import argparse
 from prettytable import PrettyTable
 
-log_directory = "test_n_1_nam_1_p_1_v_1/"
+# Create an argument parser to get the log directory from the user
+parser = argparse.ArgumentParser()
+parser.add_argument("log_directory", help="Path to the log directory")
+args = parser.parse_args()
+
+log_directory = args.log_directory
+
 
 # Dictionary to store the function names and execution times
 data = {}
@@ -17,7 +24,7 @@ for log_file in log_files:
     with open(file_path, "r") as file:
         for line in file:
             parts = line.strip().split(":")
-            function_name = parts[2].strip()
+            function_name = parts[2].strip().split()[1] 
             execution_time = float(parts[3].split()[0])
             
             # Add the execution time to the function's entry in the dictionary
