@@ -13,12 +13,12 @@ ansible-playbook playbook_run_test_ingest_ocp_on_gcp_static.yml  -e nodes=10
 this test run test ingest_ocp_on_gcp_static with two clusters. It profiles the test case and generates log files which are copied 
 to local directory test_n_{node}_nam_{namespace}_p_{pod}_v_{volume}
 
-# to parse the results into table and graph corresponding python scripts are placed in this repo
-python3 parse_results_to_table.py test_n_{node}_nam_{namespace}_p_{pod}_v_{volume}
+# to parse the results into table and matplot graph 
+python3 parse_results_to_table.py <local_generated_directory> 
 
 This generates a test results table
 
 Similarly, to generate matplot lib graph for the results run this command
-python3 parse_results_to_graph.py test_n_{node}_nam_{namespace}_p_{pod}_v_{volume}
+python3 parse_results_to_graph.py <local_generated_directory> 
 
 
