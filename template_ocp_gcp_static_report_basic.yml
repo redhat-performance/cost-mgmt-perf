@@ -1,0 +1,38 @@
+---
+generators:
+  - OCPGenerator:
+      start_date: last_month 
+      nodes:
+        - node:  # worker node
+          node_name: test_gcp
+          cpu_cores: 10
+          memory_gig: 10
+          namespaces:
+            test_random:   # non-default_project
+              pods:
+                - pod:
+                  pod_name: random
+                  cpu_request: 5
+                  mem_request_gig: 4
+                  cpu_limit: 8
+                  mem_limit_gig: 8
+                  pod_seconds: 3600
+                  cpu_usage:
+                    full_period: 4
+                  mem_usage_gig:
+                    full_period: 3
+                  labels: label_app:random
+              volumes:
+                - volume:
+                  volume_name: pvc_gcp_random
+                  storage_class: gp2
+                  volume_request_gig: 7
+                  labels: label_volume:random
+                  volume_claims:
+                  - volume_claim:
+                    volume_claim_name: data_random
+                    pod_name: random
+                    labels: label_volume:stor_random
+                    capacity_gig: 10
+                    volume_claim_usage_gig:
+                      full_period: 6

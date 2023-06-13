@@ -1,0 +1,51 @@
+- name: Copy gcp and ocp data to IQE pod 
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
+    ocp_file_kikis: ocp_gcp_static_report_basic_kikis_perf.yml
+    gcp_file: gcp_static_report_basic_perf.yml
+    nodes: 1
+    namespaces: 1
+    pods: 1
+    volumes: 1
+
+  tasks:
+    - name: Get pod names with grep
+      shell: "oc get pods | grep '^iqe' | awk '{print $1}'"
+      register: pod_name
+      
+    - name: fail the task if podname is not found
+      fail:
+        msg: "{{ pod_name.stderr }}"
+      when: pod_name.stdout | length == 0
+
+    - name: Get current date and time
+      command: date +'%Y-%m-%d_%H-%M-%S'
+      register: current_date_time
+
+    - name: Set fact log file name
+      set_fact:
+        file_name: "{{ current_date_time.stdout }}"
+
+    - name: set fact dir name 
+      set_fact:
+        dir_name: test_n_{{ nodes }}_nam_{{ namespaces }}_p_{{ pods }}_v_{{ volumes }}
+
+    - name: Create the directory
+      file: 
+        path: /Users/spadakan/Documents/devel/bonfire_venv/{{ dir_name }}
+        state: directory
+
+    - name: Execute the test_api_ocp_on_gcp_ingest_single_source
+      shell: |
+        oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"test_api_ocp_on_gcp_ingest_single_source\" -m cost_smoke --log-file logs.txt"
+        oc exec {{ pod_name.stdout }} -- sh -c "grep \"myprofiler.py\" logs.txt > log_results_{{ file_name }}_{{ item }}"
+        oc rsync {{ pod_name.stdout }}:/iqe_venv/log_results_{{ file_name }}_{{ item }} {{dir_name}}/
+      loop: 
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5

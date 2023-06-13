@@ -1,0 +1,73 @@
+- name: Copy gcp and ocp data to IQE pod 
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
+    ocp_file_kikis: ocp_gcp_static_report_basic_kikis_perf.yml
+    gcp_file: gcp_static_report_basic_perf.yml
+    nodes: 1
+    namespaces: 1
+    pods: 1
+    volumes: 1
+
+  tasks:
+    - name: Get pod names with grep
+      shell: "oc get pods | grep '^iqe' | awk '{print $1}'"
+      register: pod_name
+      
+    - name: fail the task if podname is not found
+      fail:
+        msg: "{{ pod_name.stderr }}"
+      when: pod_name.stdout | length == 0
+
+    - name: Generate GCP and OCP fake data 
+      shell: python3 generate_ocp_gcp_static_report_basic.py template_ocp_gcp_static_report_basic.yml output_pom.yml nodes={{ nodes }} namespaces={{ namespaces}} volumes={{ volumes }} pods={{ pods }}
+
+    - name: Copy {{ gcp_file }} to {{ pod_name.stdout }}
+      shell: |
+        oc cp {{ gcp_file }} {{ pod_name.stdout }}:/iqe_venv/lib/python3.9/site-packages/iqe_cost_management/data/gcp/gcp_static_report_basic.yml
+
+    - name: Retrive file information {{ gcp_file }}
+      stat:
+        path: "{{ gcp_file }}"
+      register: file_info
+
+    - name: Calculate {{ gcp_file }} file size in MB
+      set_fact:
+        file_size_mb: "{{ (file_info.stat.size / (1024 ** 2)) | round(2) }}"
+
+    - name: Print {{ gcp_file }} file size in MB
+      debug:
+        msg: "File size: {{ file_size_mb }} MB"
+
+    - name: Copy {{ ocp_file }} to {{ pod_name.stdout }}
+      shell: |
+        oc cp {{ ocp_file_pom }} {{ pod_name.stdout }}:/iqe_venv/lib/python3.9/site-packages/iqe_cost_management/data/gcp/openshift/ocp_gcp_static_report_basic_pom.yml
+        oc cp {{ ocp_file_kikis }} {{ pod_name.stdout }}:/iqe_venv/lib/python3.9/site-packages/iqe_cost_management/data/gcp/openshift/ocp_gcp_static_report_basic_kikis.yml
+
+    - name: Retrive file information {{ ocp_file_pom }}
+      stat:
+        path: "{{ ocp_file_pom }}"
+      register: file_info
+
+    - name: Calculate {{ ocp_file_pom }} file size in MB
+      set_fact:
+        file_size_mb: "{{ (file_info.stat.size / (1024 ** 2)) | round(2) }}"
+
+    - name: Print {{ ocp_file_pom }} file size in MB
+      debug:
+        msg: "File size: {{ file_size_mb }} MB"
+
+    - name: Retrive file information {{ ocp_file_kikis }}
+      stat:
+        path: "{{ ocp_file_kikis }}"
+      register: file_info
+
+    - name: Calculate {{ ocp_file_kikis }} file size in MB
+      set_fact:
+        file_size_mb: "{{ (file_info.stat.size / (1024 ** 2)) | round(2) }}"
+
+    - name: Print {{ ocp_file_kikis }} file size in MB
+      debug:
+        msg: "File size: {{ file_size_mb }} MB"
