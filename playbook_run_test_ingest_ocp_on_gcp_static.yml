@@ -2,6 +2,7 @@
   hosts: "{{ target_host }}"
   gather_facts: no
   become: yes
+  become_user: ec2-user
 
   vars:
     ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
