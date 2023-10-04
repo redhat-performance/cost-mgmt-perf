@@ -53,7 +53,7 @@
       register: job_result
       until: job_result.finished
       retries: "{{ wait_time }}"
-      delay: 1
+      delay: 60
     
     - name: Exiting the playbook
       debug:
