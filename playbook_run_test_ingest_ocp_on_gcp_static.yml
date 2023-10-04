@@ -45,10 +45,11 @@
         oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"{{ test_to_run }}\" -m cost_smoke --log-file {{test_to_run}}_logs.txt"
       async: "{{ wait_time }}"
       poll: 0
+      register: async_result
 
     - name:  wait for task {{ wait_time }} seconds to finish 
       async_status:
-        jid: "{{ ansible_job_id }}"
+        jid: "{{ async_result.ansible_job_id }}"
       register: job_result
       until: job_result.finished
       retries: "{{ wait_time }}"
@@ -57,7 +58,4 @@
     - name: Exiting the playbook
       debug:
         msg: "Exiting playbook after waiting {{ wait_time }} seconds"
-
-
-
       
