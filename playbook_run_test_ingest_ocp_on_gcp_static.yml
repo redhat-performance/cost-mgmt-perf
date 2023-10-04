@@ -43,8 +43,21 @@
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
       shell: |
         oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"{{ test_to_run }}\" -m cost_smoke --log-file {{test_to_run}}_logs.txt"
-      register: test_output
+      async: "{{ wait_time }}"
+      poll: 0
 
-    - name: print the test output
+    - name:  wait for task {{ wait_time }} seconds to finish 
+      async_status:
+        jid: "{{ ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: "{{ wait_time }}"
+      delay: 1
+    
+    - name: Exiting the playbook
       debug:
-        msg: "{{ test_output.stdout }}"
+        msg: "Exiting playbook after waiting {{ wait_time }} seconds"
+
+
+
+      
