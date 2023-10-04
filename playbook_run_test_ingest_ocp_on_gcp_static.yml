@@ -1,6 +1,7 @@
 - name: Copy gcp and ocp data to IQE pod 
   hosts: "{{ target_host }}"
   gather_facts: no
+  become: yes
 
   vars:
     ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
