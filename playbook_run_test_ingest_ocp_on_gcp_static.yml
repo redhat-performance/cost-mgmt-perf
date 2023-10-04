@@ -36,7 +36,7 @@
 
     - name: Create the directory
       file: 
-        path: /Users/spadakan/Documents/devel/bonfire_venv/{{ dir_name }}
+        path: /home/ec2-user/{{ dir_name }}
         state: directory
 
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
