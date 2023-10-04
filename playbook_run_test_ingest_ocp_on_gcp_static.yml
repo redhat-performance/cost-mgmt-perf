@@ -42,7 +42,7 @@
 
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
       shell: |
-        oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"test_api_ocp_on_gcp_ingest_single_source\" -m cost_smoke --log-file logs.txt"
+        oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"{{ test_to_run }}\" -m cost_smoke --log-file {{test_to_run}}_logs.txt"
       register: test_output
 
     - name: print the test output
