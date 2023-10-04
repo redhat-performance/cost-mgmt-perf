@@ -43,5 +43,8 @@
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
       shell: |
         oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"test_api_ocp_on_gcp_ingest_single_source\" -m cost_smoke --log-file logs.txt"
-        #oc exec {{ pod_name.stdout }} -- sh -c "grep \"myprofiler.py\" logs.txt > log_results_{{ file_name }}_{{ item }}"
-        #oc rsync {{ pod_name.stdout }}:/iqe_venv/log_results_{{ file_name }}_{{ item }} {{dir_name}}/
+      register: test_output
+
+    - name: print the test output
+      debug:
+        msg: "{{ test_output.stdout }}"
