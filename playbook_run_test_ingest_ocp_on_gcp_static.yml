@@ -46,7 +46,3 @@
         oc rsync {{ pod_name.stdout }}:/iqe_venv/log_results_{{ file_name }}_{{ item }} {{dir_name}}/
       loop: 
         - 1
-        - 2
-        - 3
-        - 4
-        - 5
