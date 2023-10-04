@@ -1,5 +1,5 @@
 - name: Copy gcp and ocp data to IQE pod 
-  hosts: localhost
+  hosts: "{{ target_host }}"
   gather_facts: no
 
   vars:
