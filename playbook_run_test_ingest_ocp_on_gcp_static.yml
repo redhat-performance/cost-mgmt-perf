@@ -15,7 +15,7 @@
 
   tasks:
     - name: Get pod names with grep
-      command: "oc get pods | grep '^iqe' | awk '{print $1}'"
+      shell: "oc get pods | grep '^iqe' | awk '{print $1}'"
       register: pod_name
       
     - name: fail the task if podname is not found
@@ -41,7 +41,7 @@
         state: directory
 
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
-      command: |
+      shell: |
         oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"test_api_ocp_on_gcp_ingest_single_source\" -m cost_smoke --log-file logs.txt"
         oc exec {{ pod_name.stdout }} -- sh -c "grep \"myprofiler.py\" logs.txt > log_results_{{ file_name }}_{{ item }}"
         oc rsync {{ pod_name.stdout }}:/iqe_venv/log_results_{{ file_name }}_{{ item }} {{dir_name}}/
