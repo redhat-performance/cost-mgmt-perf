@@ -1,17 +1,17 @@
+# This playbook copies GCP and OCP data to IQE pod and executes a test.
+# The playbook performs the following tasks:
+# 1. Get pod names with grep
+# 2. Fail the task if podname is not found
+# 3. Get current date and time
+# 4. Set fact log file name
+# 5. Set fact dir name
+# 6. Create the directory
+# 7. Execute the test_api_ocp_on_gcp_ingest_single_source
 - name: Copy gcp and ocp data to IQE pod 
   hosts: "{{ target_host }}"
   gather_facts: no
-  become: yes
-  become_user: ec2-user
-
-  vars:
-    ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
-    ocp_file_kikis: ocp_gcp_static_report_basic_kikis_perf.yml
-    gcp_file: gcp_static_report_basic_perf.yml
-    nodes: 1
-    namespaces: 1
-    pods: 1
-    volumes: 1
+  vars_files: 
+    - vars.yml
 
   tasks:
     - name: Get pod names with grep
@@ -37,25 +37,11 @@
 
     - name: Create the directory
       file: 
-        path: /home/ec2-user/{{ dir_name }}
+        path: "$PWD/{{ dir_name }}"
         state: directory
 
     - name: Execute the test_api_ocp_on_gcp_ingest_single_source
       shell: |
         oc exec {{ pod_name.stdout }} -- sh -c "iqe tests plugin cost_management -k \"{{ test_to_run }}\" -m cost_smoke --log-file {{test_to_run}}_logs.txt"
-      async: "{{ wait_time }}"
-      poll: 0
-      register: async_result
-
-    - name:  wait for task {{ wait_time }} seconds to finish 
-      async_status:
-        jid: "{{ async_result.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: "{{ wait_time }}"
-      delay: 1
-    
-    - name: Exiting the playbook
-      debug:
-        msg: "Exiting playbook after waiting {{ wait_time }} seconds"
-      
+      register: log_output
+     

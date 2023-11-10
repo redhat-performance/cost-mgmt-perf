@@ -1,0 +1,10 @@
+target_host: localhost
+test_to_run: test_api_aws
+wait_time: 1800
+ocp_file_pom: ocp_gcp_static_report_basic_pom_perf.yml
+ocp_file_kikis: ocp_gcp_static_report_basic_kikis_perf.yml
+gcp_file: gcp_static_report_basic_perf.yml
+nodes: 1
+namespaces: 1
+pods: 1
+volumes: 1
